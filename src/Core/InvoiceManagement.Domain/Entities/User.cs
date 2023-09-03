@@ -10,5 +10,8 @@ namespace InvoiceManagement.Domain.Entities
         public string Phone { get; set; }
         public string Email { get; set; }
         public ICollection<Invoice> Invoices { get; set; }
+
+        public ICollection<Home> LandlordHomes { get; set; }
+        public Home ResidentHome { get; set; }
     }
 }
