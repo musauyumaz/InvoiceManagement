@@ -1,5 +1,7 @@
 ﻿using InvoiceManagement.Domain.Entities;
+using InvoiceManagement.Domain.Entities.Common;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Reflection;
 
 namespace InvoiceManagement.Persistence.Contexts
@@ -22,6 +24,25 @@ namespace InvoiceManagement.Persistence.Contexts
         {
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
             base.OnModelCreating(modelBuilder);
+        }
+
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            IEnumerable<EntityEntry<BaseEntity>> datas = ChangeTracker.Entries<BaseEntity>();
+
+            foreach (EntityEntry<BaseEntity> data in datas)
+            {
+                if (data.State == EntityState.Added)
+                {
+                    data.Entity.CreatedDate = DateTime.UtcNow;
+                    data.Entity.IsActive = true;
+                }
+                else if (data.State == EntityState.Modified)
+                    data.Entity.UpdatedDate = DateTime.UtcNow;
+            }
+
+
+            return base.SaveChangesAsync(cancellationToken);
         }
     }
 }
